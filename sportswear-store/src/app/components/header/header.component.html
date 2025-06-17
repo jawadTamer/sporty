@@ -1,0 +1,79 @@
+<mat-toolbar color="primary" class="header-toolbar">
+  <div class="toolbar-content">
+    <div class="logo-section">
+      <mat-icon class="logo-icon">sports_soccer</mat-icon>
+      <span class="logo-text">SportWear Store</span>
+    </div>
+
+    <nav class="nav-links">
+      <a
+        mat-button
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon>home</mat-icon>
+        Home
+      </a>
+      <a mat-button routerLink="/products" routerLinkActive="active">
+        <mat-icon>category</mat-icon>
+        Products
+      </a>
+      <a mat-button routerLink="/about" routerLinkActive="active">
+        <mat-icon>info</mat-icon>
+        About
+      </a>
+      <a mat-button routerLink="/contact" routerLinkActive="active">
+        <mat-icon>contact_support</mat-icon>
+        Contact
+      </a>
+    </nav>
+
+    <div class="auth-section">
+      <ng-container *ngIf="user$ | async as user; else authButtons">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <div class="user-info">
+            <p>{{ user.email }}</p>
+            <p *ngIf="isAdmin$ | async" class="admin-badge">Admin</p>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item routerLink="/profile">
+            <mat-icon>person</mat-icon>
+            Profile
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="isAdmin$ | async"
+            routerLink="/dashboard"
+          >
+            <mat-icon>dashboard</mat-icon>
+            Dashboard
+          </button>
+          <button mat-menu-item (click)="signOut()">
+            <mat-icon>logout</mat-icon>
+            Sign Out
+          </button>
+        </mat-menu>
+      </ng-container>
+
+      <ng-template #authButtons>
+        <button mat-button routerLink="/login" class="login-btn">
+          <mat-icon>login</mat-icon>
+          Login
+        </button>
+        <button
+          mat-raised-button
+          routerLink="/signup"
+          color="accent"
+          class="signup-btn"
+        >
+          <mat-icon>person_add</mat-icon>
+          Sign Up
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</mat-toolbar>

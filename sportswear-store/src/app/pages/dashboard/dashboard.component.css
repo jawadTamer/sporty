@@ -1,0 +1,121 @@
+.dashboard-container {
+  height: 100vh;
+  margin-top: 64px;
+}
+
+.dashboard-sidenav {
+  width: 280px;
+  background: #2c3e50;
+  color: white;
+}
+
+.sidenav-header {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #34495e;
+}
+
+.dashboard-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  color: #3498db;
+  margin-bottom: 0.5rem;
+}
+
+.sidenav-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: white;
+}
+
+.sidenav-list {
+  padding: 1rem 0;
+}
+
+.sidenav-list a {
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.sidenav-list a:hover {
+  background: #34495e;
+  color: white;
+}
+
+.sidenav-list a.active {
+  background: #3498db;
+  color: white;
+}
+
+.sidenav-list mat-icon {
+  color: inherit;
+}
+
+.sidenav-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid #34495e;
+}
+
+.back-to-store {
+  color: #3498db !important;
+}
+
+.back-to-store:hover {
+  background: #34495e !important;
+  color: white !important;
+}
+
+.dashboard-content {
+  background: #f8f9fa;
+}
+
+.dashboard-toolbar {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.menu-toggle {
+  margin-right: 1rem;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-email {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.page-content {
+  padding: 2rem;
+  min-height: calc(100vh - 64px - 64px);
+}
+
+@media (max-width: 768px) {
+  .dashboard-sidenav {
+    width: 250px;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+
+  .user-email {
+    display: none;
+  }
+}

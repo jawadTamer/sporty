@@ -1,0 +1,143 @@
+<div class="product-details-container" *ngIf="!loading; else loadingTemplate">
+  <div class="container" *ngIf="product; else notFoundTemplate">
+    <div class="product-grid">
+      <!-- Product Image -->
+      <div class="product-image-section">
+        <img
+          [src]="product.imageUrl"
+          [alt]="product.name"
+          class="product-image"
+        />
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info-section">
+        <div class="product-header">
+          <h1 class="product-name">{{ product.name }}</h1>
+          <p class="product-category">{{ product.category }}</p>
+          <div class="product-price">${{ product.price }}</div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="product-description">
+          <h3>Description</h3>
+          <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="product-options" *ngIf="product.sizes.length > 0">
+          <h3>Select Size</h3>
+          <div class="option-chips">
+            <mat-chip
+              *ngFor="let size of product.sizes"
+              [class.selected]="selectedSize === size"
+              (click)="selectSize(size)"
+              class="option-chip"
+            >
+              {{ size }}
+            </mat-chip>
+          </div>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="product-options" *ngIf="product.colors.length > 0">
+          <h3>Select Color</h3>
+          <div class="option-chips">
+            <mat-chip
+              *ngFor="let color of product.colors"
+              [class.selected]="selectedColor === color"
+              (click)="selectColor(color)"
+              class="option-chip"
+            >
+              {{ color }}
+            </mat-chip>
+          </div>
+        </div>
+
+        <!-- Quantity Selection -->
+        <div class="quantity-section">
+          <h3>Quantity</h3>
+          <div class="quantity-controls">
+            <button
+              mat-icon-button
+              (click)="decreaseQuantity()"
+              [disabled]="quantity <= 1"
+            >
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="quantity-display">{{ quantity }}</span>
+            <button mat-icon-button (click)="increaseQuantity()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stock Status -->
+        <div class="stock-status">
+          <mat-icon
+            [class.in-stock]="product.inStock"
+            [class.out-of-stock]="!product.inStock"
+          >
+            {{ product.inStock ? "check_circle" : "cancel" }}
+          </mat-icon>
+          <span
+            [class.in-stock]="product.inStock"
+            [class.out-of-stock]="!product.inStock"
+          >
+            {{ product.inStock ? "In Stock" : "Out of Stock" }}
+          </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            class="add-to-cart-btn"
+            [disabled]="!product.inStock || !selectedSize || !selectedColor"
+            (click)="addToCart()"
+          >
+            <mat-icon>add_shopping_cart</mat-icon>
+            Add to Cart
+          </button>
+
+          <button mat-stroked-button class="wishlist-btn">
+            <mat-icon>favorite_border</mat-icon>
+            Add to Wishlist
+          </button>
+        </div>
+
+        <!-- Product Features -->
+        <div class="product-features">
+          <h3>Features</h3>
+          <ul>
+            <li>Premium quality materials</li>
+            <li>Comfortable fit</li>
+            <li>Durable construction</li>
+            <li>30-day return policy</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+    <p>Loading product details...</p>
+  </div>
+</ng-template>
+
+<ng-template #notFoundTemplate>
+  <div class="not-found-container">
+    <mat-icon class="not-found-icon">inventory_2</mat-icon>
+    <h2>Product Not Found</h2>
+    <p>The product you're looking for doesn't exist or has been removed.</p>
+    <button mat-raised-button color="primary" routerLink="/products">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Products
+    </button>
+  </div>
+</ng-template>

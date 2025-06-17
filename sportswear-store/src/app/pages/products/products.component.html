@@ -1,0 +1,135 @@
+<div class="products-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Our Products</h1>
+      <p>Discover our collection of premium sports wear and athletic gear</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filters-grid">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search Products</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            placeholder="Search by name or description"
+          />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="category-field">
+          <mat-label>Category</mat-label>
+          <mat-select
+            [(ngModel)]="selectedCategory"
+            (selectionChange)="onCategoryChange()"
+          >
+            <mat-option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="clearFilters()" class="clear-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <div class="results-info">
+        <p>
+          {{ filteredProducts.length }} product{{
+            filteredProducts.length !== 1 ? "s" : ""
+          }}
+          found
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- No Products State -->
+    <div *ngIf="!loading && filteredProducts.length === 0" class="no-products">
+      <mat-icon>inventory_2</mat-icon>
+      <h3>No Products Found</h3>
+      <p>Try adjusting your search criteria or browse all categories.</p>
+      <button mat-raised-button color="primary" (click)="clearFilters()">
+        <mat-icon>refresh</mat-icon>
+        Show All Products
+      </button>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading && filteredProducts.length > 0" class="products-grid">
+      <mat-card *ngFor="let product of filteredProducts" class="product-card">
+        <div class="product-image-container">
+          <img
+            [src]="product.imageUrl"
+            [alt]="product.name"
+            class="product-image"
+          />
+          <div class="product-overlay">
+            <button
+              mat-raised-button
+              color="primary"
+              [routerLink]="['/product', product.id]"
+              class="view-btn"
+            >
+              <mat-icon>visibility</mat-icon>
+              View Details
+            </button>
+          </div>
+        </div>
+
+        <mat-card-content>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-category">{{ product.category }}</p>
+          <p class="product-price">${{ product.price }}</p>
+          <p class="product-description">{{ product.description }}</p>
+
+          <div class="product-status">
+            <mat-icon
+              [class.in-stock]="product.inStock"
+              [class.out-of-stock]="!product.inStock"
+            >
+              {{ product.inStock ? "check_circle" : "cancel" }}
+            </mat-icon>
+            <span
+              [class.in-stock]="product.inStock"
+              [class.out-of-stock]="!product.inStock"
+            >
+              {{ product.inStock ? "In Stock" : "Out of Stock" }}
+            </span>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button
+            mat-raised-button
+            color="primary"
+            [routerLink]="['/product', product.id]"
+            class="details-btn"
+          >
+            <mat-icon>visibility</mat-icon>
+            View Details
+          </button>
+
+          <button
+            mat-stroked-button
+            [disabled]="!product.inStock"
+            class="cart-btn"
+          >
+            <mat-icon>add_shopping_cart</mat-icon>
+            Add to Cart
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>
