@@ -170,18 +170,39 @@
                 <div class="address-info">
                   <p>
                     <strong>{{
-                      order.shippingAddress?.fullName || "N/A"
+                      (order.shippingAddress &&
+                        order.shippingAddress.fullName) ||
+                        "N/A"
                     }}</strong>
                   </p>
-                  <p>{{ order.shippingAddress?.address || "N/A" }}</p>
                   <p>
-                    {{ order.shippingAddress?.city || "N/A" }},
-                    {{ order.shippingAddress?.state || "N/A" }}
-                    {{ order.shippingAddress?.zipCode || "N/A" }}
+                    {{
+                      (order.shippingAddress &&
+                        order.shippingAddress.address) ||
+                        "N/A"
+                    }}
+                  </p>
+                  <p>
+                    {{
+                      (order.shippingAddress && order.shippingAddress.city) ||
+                        "N/A"
+                    }},
+                    {{
+                      (order.shippingAddress && order.shippingAddress.state) ||
+                        "N/A"
+                    }}
+                    {{
+                      (order.shippingAddress &&
+                        order.shippingAddress.zipCode) ||
+                        "N/A"
+                    }}
                   </p>
                   <p>
                     <strong>Phone:</strong>
-                    {{ order.shippingAddress?.phone || "N/A" }}
+                    {{
+                      (order.shippingAddress && order.shippingAddress.phone) ||
+                        "N/A"
+                    }}
                   </p>
                 </div>
               </div>
@@ -192,37 +213,46 @@
                 <div class="order-items">
                   <div *ngFor="let item of order.items" class="order-item">
                     <img
-                      [src]="item.product?.imageUrl"
-                      [alt]="item.product?.name || 'Product'"
+                      [src]="item.product && item.product.imageUrl"
+                      [alt]="(item.product && item.product.name) || 'Product'"
                       class="item-image"
                       (error)="onImageError($event)"
                     />
                     <div class="item-details">
                       <h5>
-                        {{ item.product?.name || "Product Name Unavailable" }}
+                        {{
+                          (item.product && item.product.name) ||
+                            "Product Name Unavailable"
+                        }}
                       </h5>
                       <p>
                         <strong>Category:</strong>
-                        {{ item.product?.category || "N/A" }}
+                        {{ (item.product && item.product.category) || "N/A" }}
                       </p>
                       <p>
                         <strong>Size:</strong>
-                        {{ item.product?.selectedSize || "Default" }}
+                        {{
+                          (item.product && item.product.selectedSize) ||
+                            "Default"
+                        }}
                       </p>
                       <p>
                         <strong>Color:</strong>
-                        {{ item.product?.selectedColor || "Default" }}
+                        {{
+                          (item.product && item.product.selectedColor) ||
+                            "Default"
+                        }}
                       </p>
                       <p><strong>Quantity:</strong> {{ item.quantity || 0 }}</p>
                       <p class="item-price">
                         <strong>Price:</strong>
-                        {{ item.product?.price | currency }} each
+                        {{ item.product && item.product.price | currency }} each
                       </p>
                     </div>
                     <div class="item-total">
                       <strong>{{
-                        (item.product?.price || 0) * (item.quantity || 0)
-                          | currency
+                        ((item.product && item.product.price) || 0) *
+                          (item.quantity || 0) | currency
                       }}</strong>
                     </div>
                   </div>
