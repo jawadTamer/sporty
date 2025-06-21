@@ -11,12 +11,6 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import {
-  Storage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from '@angular/fire/storage';
 import { Observable, from } from 'rxjs';
 
 export interface Product {
@@ -30,13 +24,15 @@ export interface Product {
   colors: string[];
   inStock: boolean;
   createdAt: Date;
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  constructor(private firestore: Firestore, private storage: Storage) {}
+  constructor(private firestore: Firestore) {}
 
   async addProduct(
     product: Omit<Product, 'id' | 'createdAt'>
@@ -96,19 +92,6 @@ export class ProductService {
   async deleteProduct(id: string): Promise<void> {
     try {
       await deleteDoc(doc(this.firestore, 'products', id));
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async uploadImage(file: File): Promise<string> {
-    try {
-      const storageRef = ref(
-        this.storage,
-        `products/${Date.now()}_${file.name}`
-      );
-      const snapshot = await uploadBytes(storageRef, file);
-      return await getDownloadURL(snapshot.ref);
     } catch (error) {
       throw error;
     }

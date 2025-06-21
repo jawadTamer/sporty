@@ -1,8 +1,16 @@
-<div class="product-details-container" *ngIf="!loading; else loadingTemplate">
+<div
+  class="product-details-container"
+  *ngIf="!loading; else loadingTemplate"
+  data-aos="fade-up"
+>
   <div class="container" *ngIf="product; else notFoundTemplate">
     <div class="product-grid">
       <!-- Product Image -->
-      <div class="product-image-section">
+      <div
+        class="product-image-section"
+        data-aos="zoom-in"
+        data-aos-delay="100"
+      >
         <img
           [src]="product.imageUrl"
           [alt]="product.name"
@@ -11,7 +19,11 @@
       </div>
 
       <!-- Product Info -->
-      <div class="product-info-section">
+      <div
+        class="product-info-section"
+        data-aos="fade-left"
+        data-aos-delay="200"
+      >
         <div class="product-header">
           <h1 class="product-name">{{ product.name }}</h1>
           <p class="product-category">{{ product.category }}</p>
@@ -20,20 +32,31 @@
 
         <mat-divider></mat-divider>
 
-        <div class="product-description">
+        <div
+          class="product-description"
+          data-aos="fade-up"
+          data-aos-delay="300"
+        >
           <h3>Description</h3>
           <p>{{ product.description }}</p>
         </div>
 
         <!-- Size Selection -->
-        <div class="product-options" *ngIf="product.sizes.length > 0">
+        <div
+          class="product-options"
+          *ngIf="product.sizes.length > 0"
+          data-aos="fade-up"
+          data-aos-delay="400"
+        >
           <h3>Select Size</h3>
           <div class="option-chips">
             <mat-chip
-              *ngFor="let size of product.sizes"
+              *ngFor="let size of product.sizes; let i = index"
               [class.selected]="selectedSize === size"
               (click)="selectSize(size)"
               class="option-chip"
+              [attr.data-aos]="'zoom-in'"
+              [attr.data-aos-delay]="100 * i + 500"
             >
               {{ size }}
             </mat-chip>
@@ -41,14 +64,21 @@
         </div>
 
         <!-- Color Selection -->
-        <div class="product-options" *ngIf="product.colors.length > 0">
+        <div
+          class="product-options"
+          *ngIf="product.colors.length > 0"
+          data-aos="fade-up"
+          data-aos-delay="500"
+        >
           <h3>Select Color</h3>
           <div class="option-chips">
             <mat-chip
-              *ngFor="let color of product.colors"
+              *ngFor="let color of product.colors; let i = index"
               [class.selected]="selectedColor === color"
               (click)="selectColor(color)"
               class="option-chip"
+              [attr.data-aos]="'zoom-in'"
+              [attr.data-aos-delay]="100 * i + 600"
             >
               {{ color }}
             </mat-chip>
@@ -56,7 +86,7 @@
         </div>
 
         <!-- Quantity Selection -->
-        <div class="quantity-section">
+        <div class="quantity-section" data-aos="fade-up" data-aos-delay="600">
           <h3>Quantity</h3>
           <div class="quantity-controls">
             <button
@@ -74,7 +104,7 @@
         </div>
 
         <!-- Stock Status -->
-        <div class="stock-status">
+        <div class="stock-status" data-aos="fade-up" data-aos-delay="700">
           <mat-icon
             [class.in-stock]="product.inStock"
             [class.out-of-stock]="!product.inStock"
@@ -90,7 +120,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="action-buttons">
+        <div class="action-buttons" data-aos="fade-up" data-aos-delay="800">
           <button
             mat-raised-button
             color="primary"
@@ -109,7 +139,7 @@
         </div>
 
         <!-- Product Features -->
-        <div class="product-features">
+        <div class="product-features" data-aos="fade-up" data-aos-delay="900">
           <h3>Features</h3>
           <ul>
             <li>Premium quality materials</li>

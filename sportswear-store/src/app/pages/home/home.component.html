@@ -1,7 +1,14 @@
-<div class="home-container">
+<div *ngIf="loading" class="loading-overlay">
+  <mat-progress-spinner
+    color="primary"
+    mode="indeterminate"
+    diameter="60"
+  ></mat-progress-spinner>
+</div>
+<div class="home-container" *ngIf="!loading">
   <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
+  <section class="hero-section" data-aos="fade-down">
+    <div class="hero-content" data-aos="zoom-in" data-aos-delay="200">
       <h1 class="hero-title">Premium Sports Wear</h1>
       <p class="hero-subtitle">
         Discover the latest in athletic gear and performance wear
@@ -11,76 +18,104 @@
           mat-raised-button
           color="primary"
           routerLink="/products"
-          class="cta-button"
+          class="cta-button enhanced-cta"
+          data-aos="fade-up"
+          data-aos-delay="400"
         >
-          <mat-icon>shopping_cart</mat-icon>
-          Shop Now
+          <mat-icon class="cta-icon">shopping_cart</mat-icon>
+          <span>Shop Now</span>
         </button>
-        <button mat-stroked-button routerLink="/about" class="secondary-button">
-          <mat-icon>info</mat-icon>
-          Learn More
+        <button
+          mat-stroked-button
+          routerLink="/about"
+          class="secondary-button enhanced-secondary"
+          data-aos="fade-up"
+          data-aos-delay="600"
+        >
+          <mat-icon class="cta-icon">info</mat-icon>
+          <span>Learn More</span>
         </button>
       </div>
     </div>
-    <div class="hero-image">
+    <div class="hero-image" data-aos="fade-left" data-aos-delay="300">
       <div class="hero-overlay"></div>
     </div>
   </section>
 
-  <!-- Categories Section -->
-  <section class="categories-section">
-    <div class="container">
-      <h2 class="section-title">Shop by Category</h2>
-      <div class="categories-grid">
-        <mat-card
-          *ngFor="let category of categories"
-          class="category-card"
-          [style.background]="category.color + '20'"
-        >
-          <mat-card-content>
-            <mat-icon [style.color]="category.color" class="category-icon">
-              {{ category.icon }}
-            </mat-icon>
-            <h3>{{ category.name }}</h3>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </div>
-  </section>
-
   <!-- Featured Products Section -->
-  <section class="featured-section">
+  <section class="featured-section" data-aos="fade-up">
     <div class="container">
-      <h2 class="section-title">Featured Products</h2>
+      <h2 class="section-title" data-aos="fade-up">Featured Products</h2>
       <div class="products-grid" *ngIf="featuredProducts.length > 0">
-        <mat-card *ngFor="let product of featuredProducts" class="product-card">
-          <img
-            mat-card-image
-            [src]="product.imageUrl"
-            [alt]="product.name"
-            class="product-image"
-          />
+        <mat-card
+          *ngFor="let product of featuredProducts; let i = index"
+          class="product-card"
+          [attr.data-aos]="'zoom-in-up'"
+          [attr.data-aos-delay]="100 * i"
+        >
+          <div class="product-image-container">
+            <img
+              [src]="product.imageUrl"
+              [alt]="product.name"
+              class="product-image"
+            />
+            <div class="product-overlay">
+              <button
+                mat-raised-button
+                color="primary"
+                [routerLink]="['/product', product.id]"
+                class="view-btn"
+              >
+                <mat-icon>visibility</mat-icon>
+                View Details
+              </button>
+            </div>
+          </div>
+
           <mat-card-content>
             <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-category">{{ product.category }}</p>
             <p class="product-price">${{ product.price }}</p>
             <p class="product-description">{{ product.description }}</p>
+
+            <div class="product-status">
+              <span
+                [class.in-stock]="product.inStock"
+                [class.out-of-stock]="!product.inStock"
+              >
+                {{ product.inStock ? "In Stock" : "Out of Stock" }}
+              </span>
+            </div>
           </mat-card-content>
+
           <mat-card-actions>
             <button
-              mat-button
+              mat-raised-button
               color="primary"
               [routerLink]="['/product', product.id]"
+              class="details-btn"
             >
+              <mat-icon>visibility</mat-icon>
               View Details
             </button>
-            <button mat-raised-button color="accent">
+
+            <button
+              mat-stroked-button
+              [disabled]="!product.inStock"
+              class="cart-btn"
+              (click)="addToCart(product)"
+            >
               <mat-icon>add_shopping_cart</mat-icon>
               Add to Cart
             </button>
           </mat-card-actions>
         </mat-card>
       </div>
-      <div class="no-products" *ngIf="featuredProducts.length === 0">
+      <div
+        class="no-products"
+        *ngIf="featuredProducts.length === 0"
+        data-aos="fade-in"
+      >
         <mat-icon>inventory_2</mat-icon>
         <p>No products available yet</p>
       </div>
@@ -88,26 +123,26 @@
   </section>
 
   <!-- Features Section -->
-  <section class="features-section">
+  <section class="features-section" data-aos="fade-up">
     <div class="container">
-      <h2 class="section-title">Why Choose Us</h2>
+      <h2 class="section-title" data-aos="fade-up">Why Choose Us</h2>
       <div class="features-grid">
-        <div class="feature-item">
+        <div class="feature-item" data-aos="flip-left" data-aos-delay="100">
           <mat-icon class="feature-icon">local_shipping</mat-icon>
           <h3>Free Shipping</h3>
           <p>Free shipping on orders over $50</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item" data-aos="flip-left" data-aos-delay="200">
           <mat-icon class="feature-icon">verified</mat-icon>
           <h3>Quality Guarantee</h3>
           <p>30-day money back guarantee</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item" data-aos="flip-left" data-aos-delay="300">
           <mat-icon class="feature-icon">support_agent</mat-icon>
           <h3>24/7 Support</h3>
           <p>Round the clock customer support</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item" data-aos="flip-left" data-aos-delay="400">
           <mat-icon class="feature-icon">security</mat-icon>
           <h3>Secure Payment</h3>
           <p>100% secure payment processing</p>

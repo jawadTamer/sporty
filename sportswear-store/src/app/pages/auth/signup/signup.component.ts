@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-signup',
@@ -77,9 +78,23 @@ export class SignupComponent {
       try {
         const { displayName, email, password } = this.signupForm.value;
         await this.authService.signUp(email, password, displayName);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Account Created!',
+          text: 'Your account has been successfully created. Welcome!',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
         this.router.navigate(['/']);
       } catch (error: any) {
-        this.errorMessage = error.message || 'Signup failed. Please try again.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Signup Failed',
+          text: error.message || 'Signup failed. Please try again.',
+          confirmButtonText: 'OK',
+        });
       } finally {
         this.loading = false;
       }

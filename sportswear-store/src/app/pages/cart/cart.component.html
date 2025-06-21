@@ -1,0 +1,181 @@
+<div class="cart-container">
+  <h2>Your Cart</h2>
+
+  <ng-container *ngIf="cart$ | async as cart">
+    <ng-container *ngIf="cart.length > 0; else empty">
+      <!-- Cart Items Table -->
+      <div class="cart-section">
+        <h3>Cart Items</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Size</th>
+              <th>Color</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of cart">
+              <td>
+                <div class="product-info">
+                  <img
+                    [src]="item.product.imageUrl"
+                    [alt]="item.product.name"
+                    class="product-thumbnail"
+                  />
+                  <div>
+                    <strong>{{ item.product.name }}</strong>
+                    <p class="product-category">{{ item.product.category }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>{{ item.product.selectedSize || "Default" }}</td>
+              <td>{{ item.product.selectedColor || "Default" }}</td>
+              <td>{{ item.product.price | currency }}</td>
+              <td>
+                <input
+                  type="number"
+                  min="1"
+                  [value]="item.quantity"
+                  (change)="onQuantityChange($event, item.product.id || '')"
+                  style="width: 60px"
+                />
+              </td>
+              <td>{{ item.product.price * item.quantity | currency }}</td>
+              <td>
+                <button
+                  (click)="removeItem(item.product.id || '')"
+                  class="remove-btn"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="cart-summary">
+          <strong>Total: {{ getTotal() | currency }}</strong>
+          <div class="cart-actions">
+            <button (click)="clearCart()" class="clear-btn">Clear Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Form -->
+      <div class="checkout-section">
+        <h3>Shipping Information</h3>
+        <form
+          [formGroup]="checkoutForm"
+          (ngSubmit)="checkout()"
+          class="checkout-form"
+        >
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Full Name</mat-label>
+              <input
+                matInput
+                formControlName="fullName"
+                placeholder="Enter your full name"
+              />
+              <mat-error *ngIf="checkoutForm.get('fullName')?.invalid">
+                Full name is required (minimum 2 characters)
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Address</mat-label>
+              <input
+                matInput
+                formControlName="address"
+                placeholder="Enter your address"
+              />
+              <mat-error *ngIf="checkoutForm.get('address')?.invalid">
+                Address is required (minimum 10 characters)
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>City</mat-label>
+              <input
+                matInput
+                formControlName="city"
+                placeholder="Enter your city"
+              />
+              <mat-error *ngIf="checkoutForm.get('city')?.invalid">
+                City is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>State</mat-label>
+              <input
+                matInput
+                formControlName="state"
+                placeholder="Enter your state"
+              />
+              <mat-error *ngIf="checkoutForm.get('state')?.invalid">
+                State is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>ZIP Code</mat-label>
+              <input
+                matInput
+                formControlName="zipCode"
+                placeholder="Enter ZIP code"
+              />
+              <mat-error *ngIf="checkoutForm.get('zipCode')?.invalid">
+                Valid ZIP code is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Phone</mat-label>
+              <input
+                matInput
+                formControlName="phone"
+                placeholder="Enter your phone number"
+              />
+              <mat-error *ngIf="checkoutForm.get('phone')?.invalid">
+                Valid phone number is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="checkout-actions">
+            <button
+              type="submit"
+              class="checkout-btn"
+              [disabled]="checkoutForm.invalid || loading"
+            >
+              <mat-icon *ngIf="!loading">shopping_cart_checkout</mat-icon>
+              <span *ngIf="loading">Processing...</span>
+              <span *ngIf="!loading">Place Order</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #empty>
+    <div class="empty-cart">
+      <mat-icon>shopping_cart</mat-icon>
+      <h3>Your cart is empty</h3>
+      <p>Add some products to get started!</p>
+      <button routerLink="/products" class="browse-btn">Browse Products</button>
+    </div>
+  </ng-template>
+</div>

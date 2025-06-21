@@ -1,13 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 import { ProductService, Product } from '../../services/product.service';
+import { CartService } from '../../services/cart.service';
+import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
+import { take } from 'rxjs/operators';
+// @ts-ignore: no types for aos
+import * as AOS from 'aos';
 
 @Component({
   selector: 'app-product-details',
@@ -21,6 +31,10 @@ import { ProductService, Product } from '../../services/product.service';
     MatChipsModule,
     MatDividerModule,
     MatBadgeModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
   ],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css'],
@@ -34,7 +48,10 @@ export class ProductDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private productService: ProductService
+    private productService: ProductService,
+    private cartService: CartService,
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +60,12 @@ export class ProductDetailsComponent implements OnInit {
       if (productId) {
         this.loadProduct(productId);
       }
+    });
+    // Initialize AOS animations
+    AOS.init({
+      duration: 900,
+      once: true,
+      easing: 'ease-in-out',
     });
   }
 
@@ -79,14 +102,52 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   addToCart(): void {
-    if (this.product && this.selectedSize && this.selectedColor) {
-      // TODO: Implement cart functionality
-      console.log('Adding to cart:', {
-        product: this.product,
-        size: this.selectedSize,
-        color: this.selectedColor,
-        quantity: this.quantity,
+    if (!this.selectedSize || !this.selectedColor) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Selection Required',
+        text: 'Please select both size and color before adding to cart.',
+        confirmButtonText: 'OK',
       });
+      return;
     }
+
+    if (this.quantity <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Quantity',
+        text: 'Please select a valid quantity.',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    this.authService.currentUser$.pipe(take(1)).subscribe((user) => {
+      if (!user || !user.uid) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Login Required',
+          text: 'Please log in to add items to your cart.',
+          confirmButtonText: 'Login',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.router.navigate(['/login']);
+          }
+        });
+        return;
+      }
+      this.cartService.addToCart(this.product!, this.quantity);
+      Swal.fire({
+        icon: 'success',
+        title: 'Added to Cart!',
+        text: `${this.product!.name} (${this.selectedSize}, ${
+          this.selectedColor
+        }) has been added to your cart.`,
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+      });
+    });
   }
 }

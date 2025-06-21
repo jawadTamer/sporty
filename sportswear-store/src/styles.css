@@ -1,7 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('bootstrap/dist/css/bootstrap.min.css');
-@import url('aos/dist/aos.css');
-@import url('sweetalert2/dist/sweetalert2.min.css');
+@import url("bootstrap/dist/css/bootstrap.min.css");
+@import url("aos/dist/aos.css");
+@import url("sweetalert2/dist/sweetalert2.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+:root {
+  --primary-dark: #22177a;
+  --primary: #605ea1;
+  --secondary: #8ea3ab;
+  --accent: #e6e9af;
+  --text-dark: #22177a;
+  --text-light: #605ea1;
+  --bg-light: #e6e8c2;
+  --bg-secondary: #8ea3ab;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", Roboto, "Helvetica Neue", sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+}

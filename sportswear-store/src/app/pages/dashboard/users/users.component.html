@@ -1,0 +1,284 @@
+<div class="users-dashboard">
+  <div class="dashboard-header">
+    <h1 class="page-title">
+      <mat-icon class="title-icon">people</mat-icon>
+      User Management
+    </h1>
+    <p class="page-subtitle">
+      Manage your store's user accounts and permissions
+    </p>
+  </div>
+
+  <div class="summary-cards" *ngIf="users$ | async as users">
+    <mat-card class="summary-card total-users">
+      <mat-card-content>
+        <div class="card-content">
+          <div class="card-icon">
+            <mat-icon>group</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3 class="card-number">{{ getTotalUsers(users) }}</h3>
+            <p class="card-label">Total Users</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card admin-users">
+      <mat-card-content>
+        <div class="card-content">
+          <div class="card-icon">
+            <mat-icon>admin_panel_settings</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3 class="card-number">{{ getAdminUsers(users) }}</h3>
+            <p class="card-label">Administrators</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card regular-users">
+      <mat-card-content>
+        <div class="card-content">
+          <div class="card-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3 class="card-number">{{ getRegularUsers(users) }}</h3>
+            <p class="card-label">Regular Users</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="main-content-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="section-icon">list</mat-icon>
+        All Users
+      </mat-card-title>
+      <mat-card-subtitle>View and manage user accounts</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="actions-bar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search users...</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Search by name or email"
+          />
+          <mat-icon matSuffix>search</mat-icon>
+          <button
+            *ngIf="searchTerm"
+            matSuffix
+            mat-icon-button
+            (click)="clearSearch()"
+            class="clear-search-btn"
+          >
+            <mat-icon>clear</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div
+        class="table-container"
+        *ngIf="filteredUsers$ | async as users; else loading"
+      >
+        <table mat-table [dataSource]="users" class="users-table">
+          <ng-container matColumnDef="avatar">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="user-avatar">
+                <div class="avatar-circle">
+                  {{ getInitials(user.displayName) }}
+                </div>
+                <div class="user-info">
+                  <div class="user-name">
+                    {{ user.displayName || "No Name" }}
+                  </div>
+                  <div class="user-id">ID: {{ user.uid.slice(0, 8) }}...</div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Display Name</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="name-cell">
+                <span class="display-name">{{
+                  user.displayName || "Not provided"
+                }}</span>
+                <span class="name-badge" *ngIf="!user.displayName"
+                  >No name set</span
+                >
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email Address</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="email-cell">
+                <mat-icon class="email-icon">email</mat-icon>
+                <span class="email-text">{{ user.email }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Role</th>
+            <td mat-cell *matCellDef="let user">
+              <mat-chip
+                [color]="getRoleColor(user.role)"
+                selected
+                class="role-chip"
+              >
+                <mat-icon class="chip-icon">{{
+                  getRoleIcon(user.role)
+                }}</mat-icon>
+                {{ user.role | titlecase }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="actions-cell">
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="menu"
+                  class="action-menu-button"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button
+                    mat-menu-item
+                    (click)="
+                      changeUserRole(
+                        user,
+                        user.role === 'admin' ? 'user' : 'admin'
+                      )
+                    "
+                  >
+                    <mat-icon>swap_horiz</mat-icon>
+                    <span>{{
+                      user.role === "admin" ? "Remove Admin" : "Make Admin"
+                    }}</span>
+                  </button>
+                  <button
+                    mat-menu-item
+                    (click)="deleteUser(user)"
+                    class="delete-action"
+                  >
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete User</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            class="user-row"
+          ></tr>
+        </table>
+
+        <div class="empty-state" *ngIf="users.length === 0">
+          <mat-icon class="empty-icon">people_outline</mat-icon>
+          <h3>No Users Found</h3>
+          <p>There are no users in the system yet.</p>
+          <button mat-raised-button color="primary">
+            <mat-icon>add</mat-icon>
+            Add First User
+          </button>
+        </div>
+      </div>
+
+      <ng-template #loading>
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading users...</p>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+  <div class="users-list" *ngIf="filteredUsers$ | async as users">
+    <mat-accordion multi>
+      <mat-expansion-panel *ngFor="let user of users" class="user-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="panel-title">
+            <div class="user-avatar-small">
+              {{ getInitials(user.displayName) }}
+            </div>
+            <div class="user-summary">
+              <div class="user-name-small">
+                {{ user.displayName || "No Name" }}
+              </div>
+              <div class="user-email-small">{{ user.email }}</div>
+            </div>
+          </mat-panel-title>
+          <mat-panel-description class="panel-description">
+            <mat-chip [color]="getRoleColor(user.role)" selected>
+              {{ user.role | titlecase }}
+            </mat-chip>
+            <mat-icon class="panel-icon">expand_more</mat-icon>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="user-details">
+          <div class="detail-item">
+            <mat-icon class="detail-icon">badge</mat-icon>
+            <div class="detail-info">
+              <span class="detail-label">Display Name:   </span>
+              <span class="detail-value">{{
+                user.displayName || "Not provided"
+              }}</span>
+            </div>
+          </div>
+          <div class="detail-item">
+            <mat-icon class="detail-icon">email</mat-icon>
+            <div class="detail-info">
+              <span class="detail-label">Email:   </span>
+              <span class="detail-value">{{ user.email }}</span>
+            </div>
+          </div>
+          <div class="detail-item">
+            <mat-icon class="detail-icon">vpn_key</mat-icon>
+            <div class="detail-info">
+              <span class="detail-label">User ID</span>
+              <span class="detail-value user-id-small">{{ user.uid }}</span>
+            </div>
+          </div>
+        </div>
+
+        <mat-action-row class="action-buttons">
+          <button
+            mat-button
+            color="primary"
+            (click)="
+              changeUserRole(user, user.role === 'admin' ? 'user' : 'admin')
+            "
+          >
+            <mat-icon>swap_horiz</mat-icon>
+            {{ user.role === "admin" ? "Remove Admin" : "Make Admin" }}
+          </button>
+          <button mat-button color="warn" (click)="deleteUser(user)">
+            <mat-icon>delete</mat-icon>
+            Delete User
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

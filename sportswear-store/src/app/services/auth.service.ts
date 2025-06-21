@@ -5,24 +5,59 @@ import {
   signInWithEmailAndPassword,
   signOut,
   user,
+  deleteUser,
+  onAuthStateChanged,
 } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
+import {
+  Firestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  getDocs,
+  deleteDoc,
+} from '@angular/fire/firestore';
+import {
+  Observable,
+  map,
+  switchMap,
+  of,
+  from,
+  BehaviorSubject,
+  take,
+} from 'rxjs';
 
 export interface User {
   uid: string;
   email: string;
-  role: 'user' | 'admin';
-  displayName?: string;
+  role: 'admin' | 'user';
+  displayName?: string | null;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  user$ = user(this.auth);
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
+  private isAuthInitializing = new BehaviorSubject<boolean>(true);
+  isAuthInitializing$ = this.isAuthInitializing.asObservable();
 
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private auth: Auth) {
+    onAuthStateChanged(this.auth, (user) => {
+      if (user) {
+        this.currentUserSubject.next({
+          uid: user.uid,
+          email: user.email!,
+          role: 'user',
+          displayName: user.displayName,
+        });
+      } else {
+        this.currentUserSubject.next(null);
+      }
+      this.isAuthInitializing.next(false);
+    });
+  }
 
   async signUp(
     email: string,
@@ -83,11 +118,51 @@ export class AuthService {
   }
 
   isAdmin(): Observable<boolean> {
-    return this.user$.pipe(
-      map((user) => {
-        if (!user) return false;
-        return user.email === 'admin@sportswear.com'; // You can change this logic
+    return this.currentUser$.pipe(
+      switchMap((user) => {
+        if (!user) return of(false);
+        return from(getDoc(doc(this.firestore, 'users', user.uid))).pipe(
+          map((docSnap) => {
+            if (!docSnap.exists()) return false;
+            const userData = docSnap.data() as User;
+            return userData.role === 'admin';
+          })
+        );
       })
     );
+  }
+
+  getAllUsers(): Observable<User[]> {
+    return from(getDocs(collection(this.firestore, 'users'))).pipe(
+      map((querySnapshot) =>
+        querySnapshot.docs.map((doc) => doc.data() as User)
+      )
+    );
+  }
+
+  async getCurrentUser(): Promise<any> {
+    return this.auth.currentUser;
+  }
+
+  async deleteUser(uid: string): Promise<void> {
+    try {
+      // Delete user document from Firestore
+      await deleteDoc(doc(this.firestore, 'users', uid));
+
+      // Note: Deleting the actual Firebase Auth user requires admin privileges
+      // and should be done server-side for security reasons
+      // This method only deletes the user document from Firestore
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateUserRole(uid: string, newRole: 'user' | 'admin'): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, 'users', uid);
+      await setDoc(userRef, { role: newRole }, { merge: true });
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -1,13 +1,13 @@
 <div class="products-page">
   <div class="container">
     <!-- Page Header -->
-    <div class="page-header">
+    <div class="page-header" data-aos="fade-down">
       <h1>Our Products</h1>
       <p>Discover our collection of premium sports wear and athletic gear</p>
     </div>
 
     <!-- Filters -->
-    <div class="filters-section">
+    <div class="filters-section" data-aos="fade-up" data-aos-delay="100">
       <div class="filters-grid">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Search Products</mat-label>
@@ -49,13 +49,17 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="loading-container">
+    <div *ngIf="loading" class="loading-container" data-aos="fade-in">
       <mat-icon class="loading-icon">hourglass_empty</mat-icon>
       <p>Loading products...</p>
     </div>
 
     <!-- No Products State -->
-    <div *ngIf="!loading && filteredProducts.length === 0" class="no-products">
+    <div
+      *ngIf="!loading && filteredProducts.length === 0"
+      class="no-products"
+      data-aos="fade-in"
+    >
       <mat-icon>inventory_2</mat-icon>
       <h3>No Products Found</h3>
       <p>Try adjusting your search criteria or browse all categories.</p>
@@ -67,7 +71,12 @@
 
     <!-- Products Grid -->
     <div *ngIf="!loading && filteredProducts.length > 0" class="products-grid">
-      <mat-card *ngFor="let product of filteredProducts" class="product-card">
+      <mat-card
+        *ngFor="let product of filteredProducts; let i = index"
+        class="product-card"
+        [attr.data-aos]="'zoom-in-up'"
+        [attr.data-aos-delay]="100 * i"
+      >
         <div class="product-image-container">
           <img
             [src]="product.imageUrl"
@@ -94,12 +103,6 @@
           <p class="product-description">{{ product.description }}</p>
 
           <div class="product-status">
-            <mat-icon
-              [class.in-stock]="product.inStock"
-              [class.out-of-stock]="!product.inStock"
-            >
-              {{ product.inStock ? "check_circle" : "cancel" }}
-            </mat-icon>
             <span
               [class.in-stock]="product.inStock"
               [class.out-of-stock]="!product.inStock"
@@ -124,6 +127,7 @@
             mat-stroked-button
             [disabled]="!product.inStock"
             class="cart-btn"
+            (click)="addToCart(product)"
           >
             <mat-icon>add_shopping_cart</mat-icon>
             Add to Cart

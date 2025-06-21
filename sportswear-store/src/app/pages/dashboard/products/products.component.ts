@@ -10,6 +10,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { ProductService, Product } from '../../../services/product.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-products',
@@ -58,12 +59,28 @@ export class ProductsComponent implements OnInit {
   }
 
   async deleteProduct(productId: string): Promise<void> {
-    if (confirm('Are you sure you want to delete this product?')) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    });
+
+    if (result.isConfirmed) {
       try {
         await this.productService.deleteProduct(productId);
         this.products = this.products.filter((p) => p.id !== productId);
+
+        Swal.fire('Deleted!', 'Product has been deleted.', 'success');
       } catch (error) {
-        console.error('Error deleting product:', error);
+        Swal.fire(
+          'Error!',
+          'Failed to delete product. Please try again.',
+          'error'
+        );
       }
     }
   }

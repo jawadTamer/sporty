@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ProductService } from '../../../services/product.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-product',
@@ -40,7 +41,6 @@ export class AddProductComponent {
   loading = false;
   errorMessage = '';
   successMessage = '';
-  selectedFile: File | null = null;
   imagePreview: string | null = null;
 
   categories = [
@@ -77,22 +77,16 @@ export class AddProductComponent {
       description: ['', [Validators.required, Validators.minLength(10)]],
       price: ['', [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
+      imageUrl: ['', [Validators.required, Validators.pattern('https?://.+')]],
       sizes: [[], Validators.required],
       colors: [[], Validators.required],
       inStock: [true],
     });
-  }
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagePreview = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
+    // Watch for imageUrl changes to update preview
+    this.productForm.get('imageUrl')?.valueChanges.subscribe((url) => {
+      this.imagePreview = url;
+    });
   }
 
   toggleSelection(field: 'sizes' | 'colors', value: string): void {
@@ -109,29 +103,29 @@ export class AddProductComponent {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.productForm.valid && this.selectedFile) {
+    if (this.productForm.valid) {
       this.loading = true;
       this.errorMessage = '';
       this.successMessage = '';
 
       try {
-        // Upload image first
-        const imageUrl = await this.productService.uploadImage(
-          this.selectedFile
-        );
-
         // Create product object
         const productData = {
           ...this.productForm.value,
-          imageUrl,
         };
 
         // Add product to database
         await this.productService.addProduct(productData);
 
-        this.successMessage = 'Product added successfully!';
+        Swal.fire({
+          icon: 'success',
+          title: 'Product Added Successfully!',
+          text: 'The product has been added to your store.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
         this.productForm.reset();
-        this.selectedFile = null;
         this.imagePreview = null;
 
         // Redirect to products list after 2 seconds
@@ -139,13 +133,15 @@ export class AddProductComponent {
           this.router.navigate(['/dashboard/products']);
         }, 2000);
       } catch (error: any) {
-        this.errorMessage =
-          error.message || 'Failed to add product. Please try again.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to Add Product',
+          text: error.message || 'Failed to add product. Please try again.',
+          confirmButtonText: 'OK',
+        });
       } finally {
         this.loading = false;
       }
-    } else if (!this.selectedFile) {
-      this.errorMessage = 'Please select an image for the product.';
     }
   }
 
@@ -162,6 +158,9 @@ export class AddProductComponent {
     }
     if (field === 'price' && control?.hasError('min')) {
       return 'Price must be greater than 0';
+    }
+    if (field === 'imageUrl' && control?.hasError('pattern')) {
+      return 'Please enter a valid image URL (starting with http:// or https://)';
     }
     return '';
   }

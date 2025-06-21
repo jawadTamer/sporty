@@ -77,49 +77,45 @@
             </mat-form-field>
           </div>
 
-          <!-- Image Upload -->
+          <!-- Image URL Input -->
           <div class="form-section">
             <h3>Product Image</h3>
 
-            <div class="image-upload-section">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Image URL</mat-label>
               <input
-                type="file"
-                #fileInput
-                (change)="onFileSelected($event)"
-                accept="image/*"
-                style="display: none"
+                matInput
+                formControlName="imageUrl"
+                placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
               />
+              <mat-icon matSuffix>image</mat-icon>
+              <mat-error *ngIf="productForm.get('imageUrl')?.invalid">
+                {{ getErrorMessage("imageUrl") }}
+              </mat-error>
+            </mat-form-field>
 
+            <div class="image-preview" *ngIf="imagePreview">
+              <img
+                [src]="imagePreview"
+                alt="Product preview"
+                class="preview-image"
+                (error)="imagePreview = null"
+              />
               <button
                 type="button"
-                mat-stroked-button
-                (click)="fileInput.click()"
-                class="upload-btn"
+                mat-icon-button
+                (click)="
+                  productForm.get('imageUrl')?.setValue(''); imagePreview = null
+                "
+                class="remove-image"
               >
-                <mat-icon>cloud_upload</mat-icon>
-                Choose Image
+                <mat-icon>close</mat-icon>
               </button>
-
-              <div class="image-preview" *ngIf="imagePreview">
-                <img
-                  [src]="imagePreview"
-                  alt="Product preview"
-                  class="preview-image"
-                />
-                <button
-                  type="button"
-                  mat-icon-button
-                  (click)="selectedFile = null; imagePreview = null"
-                  class="remove-image"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-
-              <p class="upload-hint">
-                Upload a high-quality image (JPG, PNG, max 5MB)
-              </p>
             </div>
+
+            <p class="upload-hint">
+              Enter a valid image URL (must start with http:// or https://)
+            </p>
           </div>
 
           <!-- Product Options -->
@@ -197,7 +193,7 @@
             mat-raised-button
             color="primary"
             type="submit"
-            [disabled]="productForm.invalid || loading || !selectedFile"
+            [disabled]="productForm.invalid || loading"
             class="submit-btn"
           >
             <mat-icon *ngIf="!loading">add</mat-icon>
@@ -210,9 +206,7 @@
           <button
             type="button"
             mat-stroked-button
-            (click)="
-              productForm.reset(); selectedFile = null; imagePreview = null
-            "
+            (click)="productForm.reset(); imagePreview = null"
             class="reset-btn"
           >
             <mat-icon>refresh</mat-icon>

@@ -1,6 +1,8 @@
 .main-content {
-  min-height: calc(100vh - 64px - 400px); /* Account for header and footer */
-  padding-top: 64px; /* Account for fixed header */
+  flex: 1;
+  margin: 0;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 /* Global styles */
@@ -10,9 +12,20 @@
 
 body {
   margin: 0;
+  padding: 0;
   font-family: "Roboto", sans-serif;
   line-height: 1.6;
   color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure the app component takes full height */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Utility classes */
@@ -33,3 +46,19 @@ body {
 .mb-2 {
   margin-bottom: 2rem;
 }
+
+app-header {
+  display: block;
+  margin: 0;
+  padding: 0;
+  /* margin-bottom: 40px; */
+}
+
+app-footer {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+
+

@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -56,9 +57,23 @@ export class LoginComponent {
       try {
         const { email, password } = this.loginForm.value;
         await this.authService.signIn(email, password);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Welcome Back!',
+          text: 'You have been successfully logged in.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
         this.router.navigate(['/']);
       } catch (error: any) {
-        this.errorMessage = error.message || 'Login failed. Please try again.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: error.message || 'Login failed. Please try again.',
+          confirmButtonText: 'OK',
+        });
       } finally {
         this.loading = false;
       }

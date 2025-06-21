@@ -1,5 +1,9 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import {
+  provideRouter,
+  withViewTransitions,
+  withInMemoryScrolling,
+} from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -12,7 +16,13 @@ import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withViewTransitions(),
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'top',
+      })
+    ),
     provideAnimations(),
     provideHttpClient(),
     importProvidersFrom([
